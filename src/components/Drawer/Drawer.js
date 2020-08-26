@@ -10,6 +10,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import MenuIcon from '@material-ui/icons/Menu';
+
 
 const useStyles = makeStyles({
   list: {
@@ -38,7 +40,7 @@ export default function(props){
         return list.map(filename=>{
           return (
           <ListItem button key={filename}>
-            <ListItemText primary={filename} />
+            <ListItemText primary={filename} onClick={ ()=>props.onFileSelect(filename) } />
           </ListItem>)
         })
       }
@@ -76,7 +78,13 @@ export default function(props){
   const anchor ='left'
   return (
     <div>
-      <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
+      <Button variant="contained" color="primary" onClick={toggleDrawer(anchor, true)}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+        }}
+        >{<MenuIcon />}</Button>
       <Drawer anchor={anchor} open={state[anchor]} onClose={toggleDrawer(anchor, false)}>
         {list(anchor)}
       </Drawer>
