@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -22,9 +22,32 @@ const useStyles = makeStyles({
 
 export default function(props){
  const classes = useStyles();
-  const [state, setState] = React.useState({
+  const [state, setState] = useState({
     left: false,
   });
+  const [isLoading, setLoading] = useState(false)
+  const [views, setViews] = useState([])
+
+  useEffect(()=>{
+    async function loadViews() {
+      setLoading(true)
+      const url = 'http://localhost:8888'
+      const listPromise = async url => {
+        const list = await fetch(url).then(resp=>resp.json())
+        setLoading(false)
+        return list.map(filename=>{
+          return (
+          <ListItem button key={filename}>
+            <ListItemText primary={filename} />
+          </ListItem>)
+        })
+      }
+      const list = await listPromise(url)
+      setViews(list)
+    }
+    if(!isLoading && views.length === 0) loadViews()
+  })
+
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -43,22 +66,10 @@ export default function(props){
       onClick={toggleDrawer(anchor, false)}
       onKeyDown={toggleDrawer(anchor, false)}
     >
-      <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List>
+
       <Divider />
       <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
+        {views}
       </List>
     </div>
   );
